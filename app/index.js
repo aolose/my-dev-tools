@@ -6,13 +6,6 @@ const isWin = /^win/.test(process.platform);
 const {killProcessById} = require('./node-kill-process');
 const {spawn} = require('child_process');
 const {fork} = require('child_process');
-const default_remote = [
-  'public/style/**/*_all.min.css',
-  'template/**/*.html',
-  'public/dist/js/**/*.js',
-  '!public/dist/js/r.js',
-  'public/dist/js/config*.js'
-];
 let config,actedBtn,actItem,actCfg;
 const fr = document.createDocumentFragment();
 const optBtns = document.querySelector('#opt_btns');
