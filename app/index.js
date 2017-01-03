@@ -6,13 +6,6 @@ const isWin = /^win/.test(process.platform);
 const {killProcessById} = require('./node-kill-process');
 const {spawn} = require('child_process');
 const {fork} = require('child_process');
-const default_remote = [
-  'public/style/**/*_all.min.css',
-  'template/**/*.html',
-  'public/dist/js/**/*.js',
-  '!public/dist/js/r.js',
-  'public/dist/js/config*.js'
-];
 let config,actedBtn,actItem,actCfg;
 const fr = document.createDocumentFragment();
 const optBtns = document.querySelector('#opt_btns');
@@ -28,20 +21,20 @@ cLis.load = function () {
   cLis.innerHTML = '';
   config.n.forEach((c) => {
     let isAct = c === detail.content._cfg && ' act' || '';
-    const node = document.createElement('div');
-    if (isAct) cLis.act = node;
-    node.className = 'cl' + isAct;
-    node.appendChild(document.createElement('div')).textContent = c.name;
-    node.cfg = c;
-    node.onclick = function () {
-      if (cLis.act !== node) {
-        if (cLis.act) cLis.act.className = 'cl';
-        (cLis.act = node).className = 'cl act';
-        cfgPanel.load(node.cfg);
-      }
+  const node = document.createElement('div');
+  if (isAct) cLis.act = node;
+  node.className = 'cl' + isAct;
+  node.appendChild(document.createElement('div')).textContent = c.name;
+  node.cfg = c;
+  node.onclick = function () {
+    if (cLis.act !== node) {
+      if (cLis.act) cLis.act.className = 'cl';
+      (cLis.act = node).className = 'cl act';
+      cfgPanel.load(node.cfg);
     }
-    fr.appendChild(node);
-  });
+  }
+  fr.appendChild(node);
+});
   cLis.appendChild(fr);
 }
 {
@@ -206,7 +199,7 @@ const cfgPanel = {
     detail.content.cfg = o;
     fr.innerHTML = '';
     [createInput('配置名称',o,'name')].concat(o.btns.map(
-      (cfg) => ('cmd' in cfg && createCMDInput(cfg)) || (cfg.server && createDeployInput(cfg))
+        (cfg) => ('cmd' in cfg && createCMDInput(cfg)) || (cfg.server && createDeployInput(cfg))
     )).forEach((el) => fr.appendChild(el));
     detail.content.innerHTML = '';
     detail.content.appendChild(fr);
@@ -244,21 +237,25 @@ const event = {
     o1.name = o2.name;
     o2.btns.forEach((c) => {
       let b,el,btns = o1.btns;
-      for (let i = 0,l = btns.length; i < l; i++) {
-        b = btns[i];
-        el=null;
-        if (b.id === c.id) {
-          btns.splice(i,1);
-          el = b.el;
-          break;
+    for (let i = 0,l = btns.length; i < l; i++) {
+      b = btns[i];
+      el=null;
+      if (b.id === c.id) {
+        btns.splice(i,1);
+        el = b.el;
+        if(el){
+          el.cfg = c;
+          el.textContent = c.name;
         }
+        break;
       }
-      Object.defineProperty(c,'el',{
-        value: el,
-        enumerable: false,
-        writable: true
-      })
+    }
+    Object.defineProperty(c,'el',{
+      value: el,
+      enumerable: false,
+      writable: true
     })
+  })
     o1.btns = o2.btns;
     if (actCfg === o1) cfgPanel.load(o1);
     else if (config.n.indexOf(o1) === -1) config.n.push(o1);
@@ -331,9 +328,9 @@ const event = {
       delete c.process;
       setTimeout(() => {
         let out = content.out;
-        out.appendChild(document.createElement('pre')).textContent = '\n\n---已停止---\n\n';
-        out.scrollTop = out.scrollHeight + 1;
-      },300);
+      out.appendChild(document.createElement('pre')).textContent = '\n\n---已停止---\n\n';
+      out.scrollTop = out.scrollHeight + 1;
+    },300);
     }
     t && (t.dataset.state = '');
   },
@@ -377,8 +374,8 @@ optBtns.load = function () {
   const btnLis = actCfg.btns || [];
   btnLis.forEach((b) => {
     if (b.el) fr.appendChild(b.el);
-    else fr.appendChild(createBtn(b));
-  });
+  else fr.appendChild(createBtn(b));
+});
   optBtns.innerHTML = '';
   optBtns.appendChild(fr);
 }
@@ -402,9 +399,9 @@ function createBtn(o) {
   }
   node.reload = function () {
     node.textContent = node.cfg.name;
-    const ks = Object.keys(actCfg);
-    for (let i = 0,l = ks.length; i < l; i++) {
-      if (actCfg[ks[i]] === node.cfg)return;
+    const btns = actCfg.btns;
+    for (let i = 0,l = btns.length; i < l; i++) {
+      if (btns[i] === node.cfg)return;
     }
     node.cfg.el = null;
     const out = node.outPut;
@@ -480,18 +477,18 @@ function exec(e,cmd,cwd) {
   };
   return new Promise((resolve,reject) => {
     terminal.on('error',(err) => {
-      e.target.dataset.state = '';
-      delete e.target.process;
-      reject(err);
-    });
-    terminal.on('exit',() => {
-      resolve();
-      e.target.dataset.state = '';
-      delete e.target.process;
-    });
-    terminal.stdout.on('data',out.bind(process.stdout));
-    terminal.stderr.on('data',out.bind(process.stderr));
-  })
+    e.target.dataset.state = '';
+  delete e.target.process;
+  reject(err);
+});
+  terminal.on('exit',() => {
+    resolve();
+  e.target.dataset.state = '';
+  delete e.target.process;
+});
+  terminal.stdout.on('data',out.bind(process.stdout));
+  terminal.stderr.on('data',out.bind(process.stderr));
+})
 }
 function upload(e,cwd,local,server) {
   if (isActiveOut(e)) return;
@@ -506,12 +503,12 @@ function upload(e,cwd,local,server) {
   };
   terminal.on('error',() => {
     btn.dataset.state = '';
-    delete btn.process;
-  });
+  delete btn.process;
+});
   terminal.on('exit',() => {
     btn.dataset.state = '';
-    delete btn.process;
-  });
+  delete btn.process;
+});
   terminal.on('message',function (m) {
     if (m === 'end') {
       if (btn.process) {
@@ -527,7 +524,7 @@ function upload(e,cwd,local,server) {
     paths: local.map((o) => path.join(cwd,o)),
     server: server,
     base: cwd
-  })
+})
 }
 function loadList() {
   if (Array.isArray(config.n)) {
@@ -535,37 +532,37 @@ function loadList() {
     _list.innerHTML = '';
     config.n.forEach((item,i) => {
       let n = document.createElement('div');
-      n.index = i;
-      n.cfg = item;
-      n.className = 'l' + (config.a === i ? ' act' : '');
-      n.textContent = item.name;
-      n.onclick = function () {
-        if (actItem !== n) {
-          if (actItem) actItem.className = 'l';
-          (actItem = n).className = 'l act';
-          delete content.out;
-          [].forEach.call(document.querySelectorAll('.nav button'),(btn) => {
-            if (btn.process) killProcessById(btn.process.pid);
-            delete btn.dataset.state;
-            btn.className = '';
-          });
-          config.a = n.index;
-          writeCfg();
-          activeCfg();
-          list.hide();
-        }
+    n.index = i;
+    n.cfg = item;
+    n.className = 'l' + (config.a === i ? ' act' : '');
+    n.textContent = item.name;
+    n.onclick = function () {
+      if (actItem !== n) {
+        if (actItem) actItem.className = 'l';
+        (actItem = n).className = 'l act';
+        delete content.out;
+        [].forEach.call(document.querySelectorAll('.nav button'),(btn) => {
+          if (btn.process) killProcessById(btn.process.pid);
+        delete btn.dataset.state;
+        btn.className = '';
+      });
+        config.a = n.index;
+        writeCfg();
+        activeCfg();
+        list.hide();
       }
-      let edit,del;
-      (del = n.appendChild(document.createElement('i'))).className = 'delete';
-      (edit = n.appendChild(document.createElement('i'))).className = 'edit edit_cfg';
-      edit.onclick = function (e) {
-        e.stopPropagation();
-        cfgPanel.load(n.cfg);
-        cfgPanel.show();
-      }
-      del.onclick = event.del_c;
-      _list.appendChild(n);
-    });
+    }
+    let edit,del;
+    (del = n.appendChild(document.createElement('i'))).className = 'delete';
+    (edit = n.appendChild(document.createElement('i'))).className = 'edit edit_cfg';
+    edit.onclick = function (e) {
+      e.stopPropagation();
+      cfgPanel.load(n.cfg);
+      cfgPanel.show();
+    }
+    del.onclick = event.del_c;
+    _list.appendChild(n);
+  });
   }
   list.hide();
 }
