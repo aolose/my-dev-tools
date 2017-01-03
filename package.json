@@ -1,0 +1,8 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "start":"electron app/main.js",
+  "scripts": {
+    "pack": "electron-packager app --platform=win32 --arch=x64 --icon=build/icon.ico --version=1.4.13 --overwrite"
+  }
+}

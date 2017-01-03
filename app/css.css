@@ -1,0 +1,737 @@
+* {
+    box-sizing: border-box;
+}
+
+#cLis .cl {
+    -webkit-app-region: no-drag;
+    padding: 0 .4em;
+    color: #b3a7a7;
+    background: rgba(0, 0, 0, 0.38);
+    font-size: .8em;
+    line-height: 3em;
+    transition: .2s;
+    opacity: .8;
+    -webkit-user-select: none;
+    cursor: default;
+}
+
+#cLis .cl:hover {
+    opacity: 1;
+}
+
+#cLis .cl.act {
+    color: #FF9800;
+    background: rgba(0, 0, 0, 0.55);
+}
+
+textarea {
+    -webkit-app-region: no-drag;
+    width: 100%;
+    height: 8em;
+    resize: none;
+    background: rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    outline: none;
+    padding: 1em;
+    color: #eee;
+}
+
+.f textarea:focus~label,.f textarea[data-v]~label {top: -1.8em;font-size: .7em;left: 0;}
+
+.f textarea~label {
+    top: .5em;
+    left: .5em;
+    z-index: 1;
+}
+
+textarea~i {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background: #00BCD4;
+    transition: .3s ease-in-out;
+}
+textarea+i{left:0;height: 0;}
+textarea+i+i{right: 0;height: 0;}
+textarea+i+i+i{top:0;width: 0;}
+textarea+i+i+i+i{bottom:0;width: 0;}
+textarea:focus+i,textarea:focus+i+i{
+    height:100%;    
+}
+textarea:focus+i+i+i,textarea:focus+i+i+i+i{
+    width:100%;    
+}
+.field {
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.28);
+    margin: 1em 0;
+    width: 90%;
+    padding: 1.2em 1em 1em;
+    border-radius: .3em;
+}
+
+.field b {
+    -webkit-app-region: no-drag;
+    position: absolute;
+    right: .2em;
+    top: .2em;
+    color: #9E9E9E;
+    text-shadow: #000 1px 1px 1px;
+    transition: .2s;
+    opacity: .3;
+    cursor: default;
+    -webkit-user-select: none;
+    padding: 0 .3em;
+}
+
+.field b:hover {
+    opacity: 1;
+}
+
+.field b:after {content: 'X';}
+
+#new_deploy,#new_cmd,#flush {
+    float: right;
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(2, 2, 2, 0.44);
+    margin: 0 1em;
+    padding: 0.5em 1.5em;
+    color: #70d0dc;
+    font-size: .7em;
+    border-radius: .3em;
+    box-shadow: rgba(0, 0, 0, 0.21) .1em .1em .3em;
+    -webkit-app-region: no-drag;
+    -webkit-user-select: none;
+    cursor: default;
+    opacity: .7;
+    transition: .2s;
+}
+
+#new_deploy:hover, #new_cmd:hover,#flush:hover {
+    opacity: 1;
+    background: #24343c;
+    border-color: transparent;
+}
+
+.detail .s {
+    overflow: auto;
+    overflow-x: hidden;
+    position: absolute;
+    left: 3em;
+    top: 3.3em;
+    right: 1em;
+    bottom: 1.5em;
+    -webkit-app-region: no-drag;
+}
+
+button {
+    -webkit-app-region: no-drag;
+}
+
+button#save_c {
+    background: #4CAF50;
+    color: #fff;
+}
+
+button#del_c {
+    background: #F44336;
+    color: #fff;
+}
+
+.btns {
+    display: flex;
+    justify-content: space-around;
+    padding: .5em;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    background: rgba(0, 0, 0, 0.14);
+}
+
+.btns button {
+    background: #545454;
+    color: #b1b1b1;
+    font-size: .75em;
+    border: 0;
+    font-family: "Microsoft YaHei",Arial;
+    padding: .2em .7em;
+    border-radius: .1em;
+    opacity: .8;
+    transition: .2s all;
+    outline: none;
+}
+
+button#add_c {
+    background: #2196F3;
+    color: #fff;
+}
+
+.btns button:hover {
+    opacity: 1;
+    background: #009688;
+    color: #fff;
+}
+
+.f label {
+    position: absolute;
+    left: 0;
+    top: -0.3em;
+    z-index: 0;
+    background: transparent;
+    color: #568ca5;
+    transition: .3s ease-in-out;
+    font-size: .9em;
+}
+
+.f input:focus~label,.f input[data-v]~label {
+    font-size: .6em;
+    left: 0;
+    top: -1.5em;
+}
+
+.detail,.cn {
+    display: none;
+    position: absolute;
+    top: 1.5em;
+    bottom: 0;
+    width: 11em;
+    background: #24292b;
+    z-index: 2;
+    transition: .5s ease-in-out;
+}
+
+.detail {
+    background: #131a1f;
+    box-shadow: inset rgba(0, 0, 0, 0.4) 0 0 .5em;
+    padding: 1em;
+}
+
+#back {
+    position: absolute;
+    color: #383838;
+    top: .3em;
+    left: .5em;
+    z-index: 3;
+    font-size: 1.5em;
+    transition: .3s;
+    cursor: default;
+    -webkit-app-region: no-drag;
+}
+
+#back:hover {
+    color: #989898;
+}
+
+.detail .f {
+    display: flex;
+    margin: 1.3em 0 .3em;
+    justify-content: center;
+    position: relative;
+    align-items: center;
+}
+
+.f.path {
+    margin-top: 2em;
+}
+
+.detail .s>.f {
+    width: 31em;
+}
+
+.detail .s>.f input {
+    border: 0;
+}
+
+.field>label {
+    color: #FF9800;
+    position: absolute;
+    top: .9em;
+    left: 1em;
+    font-size: .5em;
+}
+
+.f input {
+    -webkit-app-region: no-drag;
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.47);
+    line-height: 1.4em;
+    outline: none;
+    z-index: 1;
+    color: #ccc;
+    font-size: .8em;
+}
+
+.f input+i {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    height: 1px;
+    transition: .4s ease-in-out;
+    margin: 0 auto;
+    width: 0;
+    background: #00BCD4;
+    z-index: 2;
+}
+
+.f input:focus+i {
+    width: 100%;
+}
+
+#list>div {
+    background: inherit;
+    border-radius: inherit;
+    position: relative;
+}
+
+span#add_cfg {
+    position: absolute;
+    color: #999;
+    width: 1.2em;
+    height: 1.2em;
+    left: 0.5em;
+    top: .6em;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: .2s ease-in-out;
+}
+
+span#add_cfg:hover {
+    color: #ffffff;
+}
+
+span#add_cfg:after,span#add_cfg:before {
+    position: absolute;
+    content: '';
+    display: block;
+    width: .15em;
+    height: 70%;
+    background: currentColor;
+    box-shadow: inset rgba(0, 0, 0, 0.22) 1px 1px 1px;
+}
+
+span#add_cfg:after {
+    height: .15em;
+    width: 70%;
+}
+
+#title {
+    font-size: .8em;
+    line-height: 1.7em;
+    font-weight: 600;
+    color: #484848;
+    /* iOS Safari */
+    -webkit-user-select: none;
+    position: absolute;
+    left: 2em;
+    top: .1em;
+    bottom: 1.7em;
+}
+
+#list {
+    min-height: 2.3em;
+    width: 13em;
+    position: absolute;
+    top: 0;
+    left: .1em;
+    background: #2b506d;
+    z-index: 100;
+    transition: .3s ease-in-out;
+    font-size: 14px;
+    color: #fff;
+    box-shadow: rgba(0, 0, 0, 0.33) 0.1em 0.3em .5em;
+    border-radius: 0 0 .3em .3em;
+    -webkit-app-region: no-drag;
+}
+
+#list:before {
+    content: '\65B0\589E\914D\7F6E';
+    display: block;
+    position: absolute;
+    left: 2em;
+    top: .5em;
+    color: #999;
+    right: 0;
+    z-index: 0;
+}
+
+#list .l {
+    padding: 0 1em 0 2em;
+    position: relative;
+    line-height: 2.4em;
+    width: 13em;
+    -webkit-user-select: none;
+    cursor: default;
+}
+
+#list .l:hover {
+    background: rgba(0, 0, 0, 0.17);
+}
+
+.l i {
+    float: right;
+    opacity: .5;
+    transition: .2s all;
+    display: block;
+    font-size: .8em;
+    margin: 1em 1em 0;
+    color: #fff;
+}
+
+.l i:hover {
+    opacity: 1;
+}
+
+.out {
+    margin: 0 0 1em;
+    overflow: auto;
+    position: absolute;
+    left: .5em;
+    right: .5em;
+    top: 1em;
+    bottom: .5em;
+    overflow-x: hidden;
+    padding: 0 1em;
+    -webkit-app-region: no-drag;
+}
+
+#choose {
+    position: absolute;
+    width: 3em;
+    z-index: 3;
+    left: -1px;
+    bottom: -1px;
+    top: 0;
+    background: #ffffff;
+    font-size: 8px;
+    -webkit-app-region: no-drag;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #9a9a9a;
+    transform: translate3d(0,0,0);
+    border-right: solid 1px rgba(0, 0, 0, 0.02);
+    transition: .2s ease-in-out;
+}
+
+#choose:hover,#choose.act {
+    background: #445c6f;
+    color: #ffffff;
+}
+
+#choose:before {
+    border-top: 0.3em solid currentColor;
+    content: "";
+    position: absolute;
+    width: 1.2em;
+    height: 1em;
+    margin: auto;
+    border-bottom: 0.3em solid currentColor;
+    top: 0.7em;
+}
+
+#choose:after {
+    display: block;
+    content: "";
+    position: relative;
+    width: 1.2em;
+    height: 0.25em;
+    background: currentColor;
+}
+
+.ctrl {
+    position: absolute;
+    width: 8em;
+    background: #2f2f2f;
+    height: 2em;
+    left: 0;
+    top: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.ctrl>div {
+    -webkit-app-region: no-drag;
+    margin: .55em .5em;
+    opacity: .7;
+    transition: .2s;
+}
+
+.ctrl>div:hover {
+    opacity: 1;
+}
+
+#kill_curr {
+    width: .9em;
+    height: .9em;
+    background: #ff564a;
+    border-radius: .1em;
+}
+
+#run_curr {
+    border: .45em solid transparent;
+    border-right: 0;
+    height: 0;
+    width: 0;
+    border-left: .8em solid #57d85d;
+    border-radius: .1em;
+}
+
+#menu .icon {
+    float: right;
+    line-height: 1.5em;
+    margin: 0.3em .3em;
+    -webkit-app-region: no-drag;
+    border-radius: 50%;
+    width: .8em;
+    height: .8em;
+    display: block;
+    color: transparent;
+    overflow: hidden;
+    opacity: .8;
+}
+
+div#min_win {
+    background: #009688;
+}
+
+div#close_win {
+    background: #E91E63;
+}
+
+#menu .icon:hover {
+    opacity: 1;
+}
+
+.window {
+    position: absolute;
+    left: 0;
+    top: 1.5em;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: 1;
+}
+
+pre {
+    white-space: pre-wrap;
+    width: 100%;
+    /*  */
+    word-break: break-all;
+}
+
+div#out {
+    position: absolute;
+    left: 8em;
+    background: #172329;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    color: #cecece;
+    box-shadow: inset rgba(0, 0, 0, 0.87) 0 0 .5em;
+}
+
+.nav {
+    position: absolute;
+    top: 2em;
+    bottom: 0;
+    left: 0;
+    width: 8em;
+    background: #212121;
+}
+
+.nav button {
+    position: relative;
+    display: block;
+    width: 100%;
+    border: 0;
+    line-height: 3em;
+    font-family: "Microsoft YaHei",Arial;
+    transition: .2s all;
+    -webkit-app-region: no-drag;
+    outline: none;
+    background: #484848;
+    color: #b9b9b9;
+    font-size: .76em;
+    min-height: 3em;
+    display: block;
+}
+
+.nav button:hover {
+    background: #5f5f5f;
+    color: #fff;
+}
+
+.nav button+button {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+button.act {
+    background: #FFEB3B;
+    color: #333;
+    font-weight: 600;
+}
+
+button[data-state]:after {
+    content: '';
+    display: block;
+    height: .5em;
+    width: .5em;
+    position: absolute;
+    top: 1.4em;
+    background: #9E9E9E;
+    left: 1em;
+    z-index: 1;
+    border-radius: 50%;
+}
+
+button[data-state="run"]:after {
+    background: #31ca37;
+}
+
+button.act:hover {
+    background: #f3db0a;
+    color: #000;
+}
+
+body {
+    -webkit-app-region: drag;
+    margin: 0;
+    padding: 0;
+    background: rgb(255, 255, 255);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    font-family: "Microsoft YaHei",Arial;
+    overflow: hidden;
+}
+
+#menu {
+    height: 1.5em;
+    background: rgb(255, 255, 255);
+    border: 1px solid rgba(0, 0, 0, 0.11);
+    border-left-color: #e4e4e4;
+    border-right-color: #e4e4e4;
+    padding: 0 .2em 0 0;
+    position: relative;
+    z-index: 108;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 .1em .1em;
+}
+
+::-webkit-scrollbar {
+    width: 0.5em;
+    height: 0.5em;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(112, 128, 144, 0.98);
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+i.edit {
+    position: relative;
+    width: 0.35em;
+    height: 0.8em;
+    background: currentColor;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+i.edit:before {
+    content: "";
+    position: absolute;
+    top: -0.35em;
+    left: 0;
+    width: 0.35em;
+    height: 0.3em;
+    background: currentColor;
+    border-radius: 0.1em;
+}
+
+i.edit:after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    top: 0.85em;
+    left: 0;
+    border: solid 0.2em currentColor;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    border-top: solid 0.45em currentColor;
+}
+
+i.delete {
+    font-size: .3em;
+    margin-top: 3em;
+    position: relative;
+    width: 2.1em;
+    height: 2.5em;
+    background: currentColor;
+    border-bottom-left-radius: 0.6em;
+    border-bottom-right-radius: 0.6em;
+    box-shadow: inset 0 0 0 0.5em currentColor,inset 0.55em 0.2em 0 0.15em #fff,inset -0.55em 0.2em 0 0.15em #fff, inset 0.9em 0 0 0.15em currentColor,inset 1em 0 0 0.15em #fff;
+}
+
+i.delete:before {
+    content: "";
+    position: absolute;
+    top: -0.5em;
+    left: -0.3em;
+    width: 2.2em;
+    height: 0.15em;
+    background: currentColor;
+    border: 0.15em solid currentColor;
+    border-top-left-radius: 0.5em;
+    border-top-right-radius: 0.5em;
+}
+
+i.delete:after {
+    content: "";
+    position: absolute;
+    display: block;
+    top: -1em;
+    left: 0.7em;
+    bottom: 4.2em;
+    width: 0.6em;
+    height: 0.6em;
+    background: currentColor;
+    border-top-left-radius: 0.3em;
+    border-top-right-radius: 0.3em;
+}
+
+#clean_curr {
+    position: relative;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    border: solid 0.25em currentColor;
+    font-size: .66em;
+    color: #6797af;
+    margin-top: .8em;
+}
+
+#clean_curr:before {
+    display: block;
+    content: "";
+    position: absolute;
+    top: 0.41em;
+    width: 1.2em;
+    height: 0.2em;
+    background: currentColor;
+    -webkit-transform: rotate(35deg);
+    -moz-transform: rotate(35deg);
+    -o-transform: rotate(35deg);
+    -ms-transform: rotate(35deg);
+    transform: rotate(35deg);
+}

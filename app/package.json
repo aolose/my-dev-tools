@@ -1,0 +1,13 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "main": "main.js",
+  "author":"Aolose",
+  "description":"用于执行自定义的命令和文件上传",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-sftp": "^0.1.5",
+    "iconv-lite": "^0.4.15",
+    "ps-tree": "^1.1.0"
+  }
+}
