@@ -4,5 +4,6 @@ process.on('message', function(m) {
   gulp
     .src(m.paths,{base:m.base})
     .pipe(sftp(m.server))
-    .on('end', ()=>process.send('end'));
+    .on('end', _=>process.send('end'))
+    .on('finish', _=>process.send('end'));
 });
