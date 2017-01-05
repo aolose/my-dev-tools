@@ -495,7 +495,7 @@ function upload(e,cwd,local,server) {
   const outPut = content.out;
   print(server.host + '\n' + server.remotePath,outPut);
   const btn = outPut.target;
-  const terminal = btn.process = fork('./deploy.js',{
+  const terminal = btn.process = fork(path.join(__dirname,'./deploy.js'),{
     silent: true
   })
   const out = function (buffer) {
