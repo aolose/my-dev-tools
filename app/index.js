@@ -15,26 +15,27 @@ const title = document.querySelector('#title');
 const detail = document.querySelector('.detail');
 const detailNav = document.querySelector('.cn');
 const cLis = document.querySelector('#cLis .s');
+let timers=[];
 detail.content = detail.querySelector('.s');
 list.load = loadList;
 cLis.load = function () {
   cLis.innerHTML = '';
   config.n.forEach((c) => {
     let isAct = c === detail.content._cfg && ' act' || '';
-  const node = document.createElement('div');
-  if (isAct) cLis.act = node;
-  node.className = 'cl' + isAct;
-  node.appendChild(document.createElement('div')).textContent = c.name;
-  node.cfg = c;
-  node.onclick = function () {
-    if (cLis.act !== node) {
-      if (cLis.act) cLis.act.className = 'cl';
-      (cLis.act = node).className = 'cl act';
-      cfgPanel.load(node.cfg);
+    const node = document.createElement('div');
+    if (isAct) cLis.act = node;
+    node.className = 'cl' + isAct;
+    node.appendChild(document.createElement('div')).textContent = c.name;
+    node.cfg = c;
+    node.onclick = function () {
+      if (cLis.act !== node) {
+        if (cLis.act) cLis.act.className = 'cl';
+        (cLis.act = node).className = 'cl act';
+        cfgPanel.load(node.cfg);
+      }
     }
-  }
-  fr.appendChild(node);
-});
+    fr.appendChild(node);
+  });
   cLis.appendChild(fr);
 }
 {
@@ -46,7 +47,8 @@ cLis.load = function () {
   sly2.display = 'block';
   sly1.width = document.body.offsetWidth - detailNav.offsetWidth + 'px';
 }
-const createCMDInput = function (o) {
+
+const baseCreate = function (o) {
   const btns = detail.content.cfg.btns;
   let idx = btns.indexOf(o);
   if (idx === -1) btns.push(o);
@@ -58,28 +60,38 @@ const createCMDInput = function (o) {
     if (idx !== -1) btns.splice(idx,1);
     node.parentNode.removeChild(node);
   };
-  l.textContent = 'CMD'
+  l.textContent = 'ID : ';
+  l.appendChild(document.createElement('span')).textContent =o.id;
   node.appendChild(createInput('名称',o,'name'));
+  return node;
+}
+
+const createTaskListInput = function (o) {
+  let node =baseCreate(o);
+  node.appendChild(createInput('任务id列队',o,'ids','text',function (v) {
+    return v.split(/[^a-zA-Z0-9]+/);
+  }));
+  node.appendChild(createInput('执行时间 [yyyy/MM/dd] hh:mm',o,'time','text',function (v,ipt) {
+    const t =/(\d{2,4}[-/]\d{1,2}[-/]\d{1,2} +)?(\d{1,2}:\d{1,2})/.exec(v)||[];
+    const n = new Date();
+    const y = t[1]||(n.toLocaleDateString()+' ');
+    const m = t[2]||(n.toTimeString().substr(0,5));
+    //@this input
+    ipt.value = y+m;
+    return y+m;
+  }));
+  return node;
+}
+
+const createCMDInput = function (o) {
+  let node =baseCreate(o);
   node.appendChild(createInput('执行位置',o,'cwd'));
   node.appendChild(createInput('命令',o,'cmd'));
   return node;
 }
 const createDeployInput = function (o) {
-  const btns = detail.content.cfg.btns;
-  let idx = btns.indexOf(o);
-  if (idx === -1) btns.push(o);
-  o = o || {};
-  let node = document.createElement('div');
-  node.className = 'field';
-  let l = node.appendChild(document.createElement('label'));
-  node.appendChild(document.createElement('b')).onclick = function () {
-    idx = btns.indexOf(o);
-    if (idx !== -1) btns.splice(idx,1);
-    node.parentNode.removeChild(node);
-  };
-  l.textContent = 'DEPLOY'
+  let node =baseCreate(o);
   let s = o.server;
-  node.appendChild(createInput('名称',o,'name'));
   node.appendChild(createInput('本地相对目录',o,'cwd'));
   node.appendChild(createInput('主机',s,'host'));
   node.appendChild(createInput('远程相对目录',s,'remotePath'));
@@ -133,7 +145,7 @@ const createPathLisArea = function (name,o,key) {
   node.label = name;
   return node;
 }
-const createInput = function (name,o,key,type) {
+const createInput = function (name,o,key,type,fix) {
   let node = document.createElement('div');
   node.className = 'f';
   node.cfg = o = o || {};
@@ -146,7 +158,7 @@ const createInput = function (name,o,key,type) {
     v = v.replace(/^\s+|\s+$/g,'');
     if (v) input.dataset.v = v;
     else delete input.dataset.v;
-    node.cfg[key] = v;
+    node.cfg[key] = fix&&fix(v,input)||v;
   }
   Object.defineProperties(node,{
     value: {
@@ -199,7 +211,9 @@ const cfgPanel = {
     detail.content.cfg = o;
     fr.innerHTML = '';
     [createInput('配置名称',o,'name')].concat(o.btns.map(
-        (cfg) => ('cmd' in cfg && createCMDInput(cfg)) || (cfg.server && createDeployInput(cfg))
+      (cfg) => ('cmd' in cfg && createCMDInput(cfg))
+      || (cfg.server && createDeployInput(cfg))
+      || (cfg.ids && createTaskListInput(cfg))
     )).forEach((el) => fr.appendChild(el));
     detail.content.innerHTML = '';
     detail.content.appendChild(fr);
@@ -237,25 +251,25 @@ const event = {
     o1.name = o2.name;
     o2.btns.forEach((c) => {
       let b,el,btns = o1.btns;
-    for (let i = 0,l = btns.length; i < l; i++) {
-      b = btns[i];
-      el=null;
-      if (b.id === c.id) {
-        btns.splice(i,1);
-        el = b.el;
-        if(el){
-          el.cfg = c;
-          el.textContent = c.name;
+      for (let i = 0,l = btns.length; i < l; i++) {
+        b = btns[i];
+        el = null;
+        if (b.id === c.id) {
+          btns.splice(i,1);
+          el = b.el;
+          if (el) {
+            el.cfg = c;
+            el.textContent = c.name;
+          }
+          break;
         }
-        break;
       }
-    }
-    Object.defineProperty(c,'el',{
-      value: el,
-      enumerable: false,
-      writable: true
+      Object.defineProperty(c,'el',{
+        value: el,
+        enumerable: false,
+        writable: true
+      })
     })
-  })
     o1.btns = o2.btns;
     if (actCfg === o1) cfgPanel.load(o1);
     else if (config.n.indexOf(o1) === -1) config.n.push(o1);
@@ -273,6 +287,17 @@ const event = {
     };
     detail.content.cfg.btns.push(o)
     detail.content.appendChild(createCMDInput(o)).scrollIntoViewIfNeeded();
+  },
+  new_sequence(){
+    const n = new Date();
+    const o={
+      id:getId(),
+      name:'',
+      ids:[],
+      time:n.toLocaleDateString()+' '+n.toTimeString().substr(0,5)
+    }
+    detail.content.cfg.btns.push(o);
+    detail.content.appendChild(createTaskListInput(o)).scrollIntoViewIfNeeded();
   },
   new_deploy(){
     const o = {
@@ -323,14 +348,20 @@ const event = {
     c = c.out;
     t = c && (c.target);
     t && (t._stop = true);
+    let _t;
+    if((_t=t.timer)!==undefined){
+      timers = timers.filter(t=>t!==_t);
+      clearTimeout(_t);
+      delete t.timer;
+    }
     if (t && t.process) {
       killProcessById(t.process.pid)
       delete c.process;
       setTimeout(() => {
         let out = content.out;
-      out.appendChild(document.createElement('pre')).textContent = '\n\n---已停止---\n\n';
-      out.scrollTop = out.scrollHeight + 1;
-    },300);
+        out.appendChild(document.createElement('pre')).textContent = '\n\n---已停止---\n\n';
+        out.scrollTop = out.scrollHeight + 1;
+      },300);
     }
     t && (t.dataset.state = '');
   },
@@ -374,15 +405,15 @@ optBtns.load = function () {
   const btnLis = actCfg.btns || [];
   btnLis.forEach((b) => {
     if (b.el) fr.appendChild(b.el);
-  else fr.appendChild(createBtn(b));
-});
+    else fr.appendChild(createBtn(b));
+  });
   optBtns.innerHTML = '';
   optBtns.appendChild(fr);
 }
 
 function readCfg() {
   let cfg = localStorage.getItem('cfg');
-  cfg&&(cfg=JSON.parse(cfg))||(cfg={a:0,n:[]})&&localStorage.setItem('cfg',JSON.stringify(cfg));
+  cfg && (cfg = JSON.parse(cfg)) || (cfg = {a: 0,n: []}) && localStorage.setItem('cfg',JSON.stringify(cfg));
   config = cfg;
 }
 function writeCfg() {
@@ -395,7 +426,8 @@ function createBtn(o) {
   node.onclick = function (e) {
     const cfg = this.cfg;
     if (cfg.cmd) exec(e,cfg.cmd,cfg.cwd);
-    else if (cfg.server) upload(e,cfg.cwd,cfg.local,cfg.server)
+    else if (cfg.server) upload(e,cfg.cwd,cfg.local,cfg.server);
+    else if (cfg.ids) taskList(e,cfg.ids,cfg.time)
   }
   node.reload = function () {
     node.textContent = node.cfg.name;
@@ -425,6 +457,9 @@ function activeCfg() {
     actCfg = {};
     optBtns.innerHTML = '';
   } else {
+    if(actCfg!==o){
+      timers.forEach(t=>clearTimeout(t))
+    }
     actCfg = o;
     title.textContent = o.name;
     optBtns.load();
@@ -459,8 +494,7 @@ function print(str,target) {
 function buffer2GBK(buffer) {
   return iconv.decode(new Buffer(buffer),'GBK')
 }
-function exec(e,cmd,cwd) {
-  if (isActiveOut(e)) return;
+function _exec(cmd,cwd) {
   const outPut = content.out;
   let args = cmd.split(/ +/g);
   let _cmd = args[0];
@@ -477,92 +511,148 @@ function exec(e,cmd,cwd) {
   };
   return new Promise((resolve,reject) => {
     terminal.on('error',(err) => {
-    e.target.dataset.state = '';
-  delete e.target.process;
-  reject(err);
-});
-  terminal.on('exit',() => {
-    resolve();
-  e.target.dataset.state = '';
-  delete e.target.process;
-});
-  terminal.stdout.on('data',out.bind(process.stdout));
-  terminal.stderr.on('data',out.bind(process.stderr));
-})
-}
-function upload(e,cwd,local,server) {
-  if (isActiveOut(e)) return;
-  const outPut = content.out;
-  print(server.host + '\n' + server.remotePath,outPut);
-  const btn = outPut.target;
-  const terminal = btn.process = fork(path.join(__dirname,'./deploy.js'),{
-    silent: true
+      reject(err);
+    });
+    terminal.on('exit',() => {
+      resolve();
+    });
+    terminal.stdout.on('data',out.bind(process.stdout));
+    terminal.stderr.on('data',out.bind(process.stderr));
   })
+}
+function exec(e,cmd,cwd) {
+  if (isActiveOut(e)) return;
+  _exec(cmd,cwd).then(() => {
+    e.target.dataset.state = '';
+    delete e.target.process;
+  },() => {
+    e.target.dataset.state = '';
+    delete e.target.process;
+  })
+}
+
+function _upload(cwd,local,server,btn) {
+  const outPut = content.out;
+  const terminal = fork(path.join(__dirname,'./deploy.js'),{
+    silent: true
+  });
+  if (btn) btn.process = terminal;
   const out = function (buffer) {
     print(buffer2GBK(buffer),outPut);
   };
-  terminal.on('error',() => {
+  return new Promise((resolve,reject) => {
+    terminal.send({
+      paths: local.map((o) => path.join(cwd,o)),
+      server: server,
+      base: cwd
+    })
+    terminal.on('error',(err) => {
+      reject(err);
+    });
+    terminal.on('exit',() => {
+      resolve();
+    });
+    terminal.on('message',function (m) {
+      debugger;
+      if (m === 'end') {
+        killProcessById(terminal.pid);
+        resolve();
+      }
+    });
+    terminal.stdout.on('data',out.bind(process.stdout));
+    terminal.stderr.on('data',out.bind(process.stderr));
+  })
+}
+
+function upload(e,cwd,local,server) {
+  if (isActiveOut(e)) return;
+  const outPut = content.out;
+  const btn = outPut.target;
+  print(server.host + '\n' + server.remotePath,outPut);
+  _upload(cwd,local,server,btn).then(() => {
     btn.dataset.state = '';
-  delete btn.process;
-});
-  terminal.on('exit',() => {
+    delete btn.process;
+  },() => {
     btn.dataset.state = '';
-  delete btn.process;
-});
-  terminal.on('message',function (m) {
-    if (m === 'end') {
-      if (btn.process) {
-        killProcessById(btn.process.pid);
+    delete btn.process;
+  });
+}
+
+function taskList(e,ids,date) {
+  if(date)date = new Date(date);
+  if (isActiveOut(e)) return;
+  const now = new Date();
+  const outPut = content.out;
+  const btn = outPut.target;
+  const list = actCfg.btns;
+  const btns = ids.map(id => list.find(a => a.id === id)).filter(i => i);
+  print('任务列队：'+btns.map((b)=>b.name).join(','),outPut);
+  const wait = date&&now<date&&date.getTime()-now.getTime();
+  if(wait)print('将在'+date.toLocaleString() +'执行。',outPut);
+  const runTask = function () {
+    let i = 0;
+    const run = function () {
+      let b = btns[i++];
+      if (!b) {
         btn.dataset.state = '';
         delete btn.process;
+        return;
       }
+      print('执行任务：'+b.name,outPut);
+      let pms;
+      if (b.cmd) pms = _exec(b.cmd,b.cwd)
+      else if (b.server) pms = _upload(b.cwd,b.local,b.server,btn)
+      else run();
+      pms.then(() => {
+        run();
+      },() => {
+        btn.dataset.state = '';
+        delete btn.process;
+      })
     }
-  });
-  terminal.stdout.on('data',out.bind(process.stdout));
-  terminal.stderr.on('data',out.bind(process.stderr));
-  terminal.send({
-    paths: local.map((o) => path.join(cwd,o)),
-    server: server,
-    base: cwd
-})
+    run();
+  }
+  if(wait)timers.push((btn.timer=setTimeout(runTask,wait)))
+  else runTask();
 }
+
 function loadList() {
   if (Array.isArray(config.n)) {
     let _list = list.list;
     _list.innerHTML = '';
     config.n.forEach((item,i) => {
       let n = document.createElement('div');
-    n.index = i;
-    n.cfg = item;
-    n.className = 'l' + (config.a === i ? ' act' : '');
-    n.textContent = item.name;
-    n.onclick = function () {
-      if (actItem !== n) {
-        if (actItem) actItem.className = 'l';
-        (actItem = n).className = 'l act';
-        delete content.out;
-        [].forEach.call(document.querySelectorAll('.nav button'),(btn) => {
-          if (btn.process) killProcessById(btn.process.pid);
-        delete btn.dataset.state;
-        btn.className = '';
-      });
-        config.a = n.index;
-        writeCfg();
-        activeCfg();
-        list.hide();
+      n.index = i;
+      n.cfg = item;
+      n.className = 'l' + (config.a === i ? ' act' : '');
+      n.textContent = item.name;
+      n.onclick = function () {
+        if (actItem !== n) {
+          if (actItem) actItem.className = 'l';
+          (actItem = n).className = 'l act';
+          delete content.out;
+          [].forEach.call(document.querySelectorAll('.nav button'),(btn) => {
+            if (btn.process) killProcessById(btn.process.pid);
+            delete btn.dataset.state;
+            btn.className = '';
+          });
+          config.a = n.index;
+          writeCfg();
+          activeCfg();
+          list.hide();
+        }
       }
-    }
-    let edit,del;
-    (del = n.appendChild(document.createElement('i'))).className = 'delete';
-    (edit = n.appendChild(document.createElement('i'))).className = 'edit edit_cfg';
-    edit.onclick = function (e) {
-      e.stopPropagation();
-      cfgPanel.load(n.cfg);
-      cfgPanel.show();
-    }
-    del.onclick = event.del_c;
-    _list.appendChild(n);
-  });
+      let edit,del;
+      (del = n.appendChild(document.createElement('i'))).className = 'delete';
+      (edit = n.appendChild(document.createElement('i'))).className = 'edit edit_cfg';
+      edit.onclick = function (e) {
+        e.stopPropagation();
+        cfgPanel.load(n.cfg);
+        cfgPanel.show();
+      }
+      del.onclick = event.del_c;
+      _list.appendChild(n);
+    });
   }
   list.hide();
 }
