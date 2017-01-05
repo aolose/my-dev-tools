@@ -23,7 +23,6 @@ electron .
 cd my-dev-tools
 electron-packager app --platform=win32 --arch=x64 --icon=build/icon.ico --version=1.4.13 --overwrite
 ```
-
 ###Screenshot
 ![1](1.png)
 
