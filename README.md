@@ -1,5 +1,7 @@
 这个小工具的初衷是用于简化项目打包部署时的一些琐碎事情
 
+[下载](https://github.com/aolose/my-dev-tools/releases/download/0.0.1/app-win32-x64.7z)
+
 ###功能：
 - 新建修改保存多个配置方案
 - 执行本地命令
