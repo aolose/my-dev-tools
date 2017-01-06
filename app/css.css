@@ -38,7 +38,7 @@
     padding: 0 .4em;
     color: #b3a7a7;
     background: rgba(0, 0, 0, 0.38);
-    font-size: .8em;
+    font-size: .9em;
     line-height: 3em;
     transition: .2s;
     opacity: .8;
@@ -97,7 +97,7 @@ textarea:focus+i+i+i,textarea:focus+i+i+i+i{
     border: 1px solid rgba(0, 0, 0, 0.28);
     margin: 1em 0;
     width: 90%;
-    padding: 1.2em 1em 1em;
+    padding: 1.3em 1em 1em;
     border-radius: .3em;
 }
 
@@ -125,10 +125,10 @@ textarea:focus+i+i+i,textarea:focus+i+i+i+i{
     float: right;
     background: rgba(0, 0, 0, 0.06);
     border: 1px solid rgba(83, 152, 162, 0.22);
-    margin: 0 1em 0 0;
-    padding: 0.5em 1.5em;
+    margin: 0 .5em 0 0;
+    padding: 0em 1em;
     color: #70d0dc;
-    font-size: .7em;
+    font-size: .8em;
     border-radius: .3em;
     box-shadow: rgba(0, 0, 0, 0.21) .1em .1em .3em;
     -webkit-app-region: no-drag;
@@ -136,6 +136,7 @@ textarea:focus+i+i+i,textarea:focus+i+i+i+i{
     cursor: default;
     opacity: .7;
     transition: .2s;
+    line-height: 2;
 }
 
 #new_deploy:hover, #new_cmd:hover,#json_cfg:hover,
@@ -181,7 +182,7 @@ button#del_c {
 .btns button {
     background: #545454;
     color: #b1b1b1;
-    font-size: .75em;
+    font-size: .85em;
     border: 0;
     font-family: "Microsoft YaHei",Arial;
     padding: .2em .7em;
@@ -214,9 +215,9 @@ button#add_c {
 }
 
 .f input:focus~label,.f input[data-v]~label {
-    font-size: .6em;
+    font-size: .7em;
     left: 0;
-    top: -1.5em;
+    top: -1.6em;
 }
 
 .detail,.cn {
@@ -254,7 +255,7 @@ button#add_c {
 
 .detail .f {
     display: flex;
-    margin: 1.3em 0 .3em;
+    margin: 1.4em 0 .3em;
     justify-content: center;
     position: relative;
     align-items: center;
@@ -287,9 +288,9 @@ button#add_c {
 .field>label {
     color: #FF9800;
     position: absolute;
-    top: .9em;
+    top: .5em;
     left: 1em;
-    font-size: .5em;
+    font-size: .7em;
 }
 
 .f input {
@@ -302,7 +303,7 @@ button#add_c {
     outline: none;
     z-index: 1;
     color: #ccc;
-    font-size: .8em;
+    font-size: .9em;
 }
 
 .f input+i {

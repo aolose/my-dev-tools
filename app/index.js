@@ -262,7 +262,7 @@ function formatJSON(o,space = 2) {
     if (type === 'object' && Array.isArray(o)) type = 'array';
     switch (type) {
       case 'array':
-        return str += '[' + o.map(m => f(n + 1,m)).join() + ']'
+        return str += '[' + o.map(m => f(n + 1,m)).join() + ']';
       case 'number':
         return o;
       case 'string':
@@ -273,7 +273,7 @@ function formatJSON(o,space = 2) {
           + f(n + 1,o[m])).join(',\n' + tabs)
           + '\n' + tabs + '}'
     }
-  }
+  };
   return f(0,o);
 }
 
