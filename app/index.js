@@ -266,7 +266,7 @@ function formatJSON(o,space = 2) {
       case 'number':
         return o;
       case 'string':
-        return '"' + o + '"';
+        return JSON.stringify(o);
       case 'object':
         let ks = Object.keys(o);
         return str += '{\n' + tabs + ks.map(m => '  "' + m + '":'
