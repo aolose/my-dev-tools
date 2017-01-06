@@ -5,6 +5,7 @@
 - 执行本地命令
 - 批量上传文件到服务器
 - 定时执行组合任务(过期则直接执行)
+- 新增显示JSON配置 方便把配置分享给别人
 
 
 ###Preparation
@@ -27,3 +28,5 @@ electron-packager app --platform=win32 --arch=x64 --icon=build/icon.ico --versio
 ![1](1.png)
 
 ![2](2.png)
+
+![3](3.png)

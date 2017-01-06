@@ -15,8 +15,22 @@ const title = document.querySelector('#title');
 const detail = document.querySelector('.detail');
 const detailNav = document.querySelector('.cn');
 const cLis = document.querySelector('#cLis .s');
-let timers=[];
+const jsonCfg = detail.querySelector('.a');
+let timers = [];
 detail.content = detail.querySelector('.s');
+
+jsonCfg.show = function () {
+  jsonCfg.t.load();
+  const sly = jsonCfg.style;
+  sly.display = 'block';
+  setTimeout(_ => sly.opacity = 1,100)
+}
+jsonCfg.hide = function () {
+  const sly = jsonCfg.style;
+  sly.opacity = 0;
+  setTimeout(_ => sly.display = '',500);
+}
+jsonCfg.querySelector('b').onclick = jsonCfg.hide;
 list.load = loadList;
 cLis.load = function () {
   cLis.innerHTML = '';
@@ -61,36 +75,36 @@ const baseCreate = function (o) {
     node.parentNode.removeChild(node);
   };
   l.textContent = 'ID : ';
-  l.appendChild(document.createElement('span')).textContent =o.id;
+  l.appendChild(document.createElement('span')).textContent = o.id;
   node.appendChild(createInput('名称',o,'name'));
   return node;
 }
 
 const createTaskListInput = function (o) {
-  let node =baseCreate(o);
+  let node = baseCreate(o);
   node.appendChild(createInput('任务id列队',o,'ids','text',function (v) {
     return v.split(/[^a-zA-Z0-9]+/);
   }));
   node.appendChild(createInput('执行时间 [yyyy/MM/dd] hh:mm',o,'time','text',function (v,ipt) {
-    const t =/(\d{2,4}[-/]\d{1,2}[-/]\d{1,2} +)?(\d{1,2}:\d{1,2})/.exec(v)||[];
+    const t = /(\d{2,4}[-/]\d{1,2}[-/]\d{1,2} +)?(\d{1,2}:\d{1,2})/.exec(v) || [];
     const n = new Date();
-    const y = t[1]||(n.toLocaleDateString()+' ');
-    const m = t[2]||(n.toTimeString().substr(0,5));
+    const y = t[1] || (n.toLocaleDateString() + ' ');
+    const m = t[2] || (n.toTimeString().substr(0,5));
     //@this input
-    ipt.value = y+m;
-    return y+m;
+    ipt.value = y + m;
+    return y + m;
   }));
   return node;
 }
 
 const createCMDInput = function (o) {
-  let node =baseCreate(o);
+  let node = baseCreate(o);
   node.appendChild(createInput('执行位置',o,'cwd'));
   node.appendChild(createInput('命令',o,'cmd'));
   return node;
 }
 const createDeployInput = function (o) {
-  let node =baseCreate(o);
+  let node = baseCreate(o);
   let s = o.server;
   node.appendChild(createInput('本地相对目录',o,'cwd'));
   node.appendChild(createInput('主机',s,'host'));
@@ -101,7 +115,8 @@ const createDeployInput = function (o) {
   node.appendChild(createPathLisArea('上传文件列表[使用glob语法]',o,'local'));
   return node;
 }
-const createPathLisArea = function (name,o,key) {
+
+const createArea = function (name,o,key,fix,set) {
   let node = document.createElement('div');
   node.className = 'f path';
   node.cfg = o = o || {};
@@ -111,24 +126,14 @@ const createPathLisArea = function (name,o,key) {
   node.appendChild(document.createElement('i'));
   node.appendChild(document.createElement('i'));
   let label = node.appendChild(document.createElement('label'));
-  input.onblur = function () {
-    let v = input.value.replace(/ +/g,'');
-    v = v.replace(/[\n,;\r]+/,',')
-    if (v) input.dataset.v = v;
-    else delete input.dataset.v;
-    input.value = v.replace(/[\n,;]+/g,'\n');
-    node.cfg[key] = v.split(/[\n,;]/);
-  }
+  input.onblur = fix;
+  input.el = node;
   Object.defineProperties(node,{
     value: {
       get(){
         return input.value
       },
-      set(v){
-        if (Array.isArray(v)) v = v.join('\n');
-        input.value = v;
-        input.onblur();
-      },
+      set,
     },
     label: {
       get(){
@@ -145,6 +150,26 @@ const createPathLisArea = function (name,o,key) {
   node.label = name;
   return node;
 }
+
+const createPathLisArea = function (name,o,key,set) {
+  return createArea(name,o,key,function () {
+    const input = this;
+    const node = input.el;
+    let v = input.value.replace(/ +/g,'');
+    v = v.replace(/[\n,;\r]+/,',')
+    if (v) input.dataset.v = 1;
+    else delete input.dataset.v;
+    input.value = v.replace(/[\n,;]+/g,'\n');
+    node.cfg[key] = v.split(/[\n,;]/);
+  },function (v) {
+    const input = this.querySelector('textarea');
+    if (Array.isArray(v)) v = v.join('\n');
+    input.value = v;
+    input.onblur();
+  })
+}
+
+
 const createInput = function (name,o,key,type,fix) {
   let node = document.createElement('div');
   node.className = 'f';
@@ -158,7 +183,7 @@ const createInput = function (name,o,key,type,fix) {
     v = v.replace(/^\s+|\s+$/g,'');
     if (v) input.dataset.v = v;
     else delete input.dataset.v;
-    node.cfg[key] = fix&&fix(v,input)||v;
+    node.cfg[key] = fix && fix(v,input) || v;
   }
   Object.defineProperties(node,{
     value: {
@@ -202,12 +227,16 @@ const cfgPanel = {
     detailNav.style.right = '-11em';
   },
   load(o) {
+    jsonCfg.hide();
     if (!o) o = {
       name: '新建配置',
       btns: []
     }
     detail.content._cfg = o;
     o = JSON.parse(JSON.stringify(o))
+    this.set(o);
+  },
+  set(o){
     detail.content.cfg = o;
     fr.innerHTML = '';
     [createInput('配置名称',o,'name')].concat(o.btns.map(
@@ -223,7 +252,59 @@ cfgPanel.hide();
 function getId() {
   return (+((Date.now() - 1483091713196 + Math.random()) * 10000).toFixed()).toString(32);
 }
+
+function formatJSON(o,space = 2) {
+  let f = function (n,o) {
+    let str = '';
+    const tab = ' '.repeat(space);
+    const tabs = tab.repeat(n);
+    let type = typeof o;
+    if (type === 'object' && Array.isArray(o)) type = 'array';
+    switch (type) {
+      case 'array':
+        return str += '[' + o.map(m => f(n + 1,m)).join() + ']'
+      case 'number':
+        return o;
+      case 'string':
+        return '"' + o + '"';
+      case 'object':
+        let ks = Object.keys(o);
+        return str += '{\n' + tabs + ks.map(m => '  "' + m + '":'
+          + f(n + 1,o[m])).join(',\n' + tabs)
+          + '\n' + tabs + '}'
+    }
+  }
+  return f(0,o);
+}
+
+jsonCfg.t = jsonCfg.appendChild(
+  createArea('JSON配置',{},'cfg',function () {
+    let c;
+    try {
+      c = JSON.parse(this.value);
+    } catch (e) {
+
+    }
+    if (c) {
+      const o = {
+        name: c.name || '',
+        btns: c.btns || []
+      }
+      cfgPanel.set(o);
+    }
+  },function (v) {
+    const input = this.querySelector('textarea');
+    if (v) input.dataset.v = 1;
+    else delete input.dataset.v;
+    input.value = formatJSON(v);
+  }))
+
+jsonCfg.t.load = function () {
+  this.value = detail.content.cfg || {}
+}
+
 const event = {
+  json_cfg: jsonCfg.show,
   add_c(){
     cfgPanel.load();
   },
@@ -290,11 +371,11 @@ const event = {
   },
   new_sequence(){
     const n = new Date();
-    const o={
-      id:getId(),
-      name:'',
-      ids:[],
-      time:n.toLocaleDateString()+' '+n.toTimeString().substr(0,5)
+    const o = {
+      id: getId(),
+      name: '',
+      ids: [],
+      time: n.toLocaleDateString() + ' ' + n.toTimeString().substr(0,5)
     }
     detail.content.cfg.btns.push(o);
     detail.content.appendChild(createTaskListInput(o)).scrollIntoViewIfNeeded();
@@ -349,8 +430,8 @@ const event = {
     t = c && (c.target);
     t && (t._stop = true);
     let _t;
-    if((_t=t.timer)!==undefined){
-      timers = timers.filter(t=>t!==_t);
+    if ((_t = t.timer) !== undefined) {
+      timers = timers.filter(t => t !== _t);
       clearTimeout(_t);
       delete t.timer;
     }
@@ -402,6 +483,7 @@ Object.keys(event).forEach((id) => {
 }
 optBtns.load = function () {
   fr.innerHTML = '';
+  [].forEach.call(optBtns.childNodes,b => b instanceof Element && b.reload());
   const btnLis = actCfg.btns || [];
   btnLis.forEach((b) => {
     if (b.el) fr.appendChild(b.el);
@@ -457,8 +539,8 @@ function activeCfg() {
     actCfg = {};
     optBtns.innerHTML = '';
   } else {
-    if(actCfg!==o){
-      timers.forEach(t=>clearTimeout(t))
+    if (actCfg !== o) {
+      timers.forEach(t => clearTimeout(t))
     }
     actCfg = o;
     title.textContent = o.name;
@@ -579,16 +661,16 @@ function upload(e,cwd,local,server) {
 }
 
 function taskList(e,ids,date) {
-  if(date)date = new Date(date);
+  if (date) date = new Date(date);
   if (isActiveOut(e)) return;
   const now = new Date();
   const outPut = content.out;
   const btn = outPut.target;
   const list = actCfg.btns;
   const btns = ids.map(id => list.find(a => a.id === id)).filter(i => i);
-  print('任务列队：'+btns.map((b)=>b.name).join(','),outPut);
-  const wait = date&&now<date&&date.getTime()-now.getTime();
-  if(wait)print('将在'+date.toLocaleString() +'执行。',outPut);
+  print('任务列队：' + btns.map((b) => b.name).join(','),outPut);
+  const wait = date && now < date && date.getTime() - now.getTime();
+  if (wait) print('将在' + date.toLocaleString() + '执行。',outPut);
   const runTask = function () {
     let i = 0;
     const run = function () {
@@ -598,7 +680,7 @@ function taskList(e,ids,date) {
         delete btn.process;
         return;
       }
-      print('执行任务：'+b.name,outPut);
+      print('执行任务：' + b.name,outPut);
       let pms;
       if (b.cmd) pms = _exec(b.cmd,b.cwd)
       else if (b.server) pms = _upload(b.cwd,b.local,b.server,btn)
@@ -612,7 +694,7 @@ function taskList(e,ids,date) {
     }
     run();
   }
-  if(wait)timers.push((btn.timer=setTimeout(runTask,wait)))
+  if (wait) timers.push((btn.timer = setTimeout(runTask,wait)))
   else runTask();
 }
 

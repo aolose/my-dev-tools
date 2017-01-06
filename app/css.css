@@ -2,6 +2,37 @@
     box-sizing: border-box;
 }
 
+.a {
+    display: none;
+    transition: .3s ease-in-out;
+    background: inherit;
+    position: absolute;
+    left: 0;
+    right: 0em;
+    top: 0;
+    bottom: 0;
+    z-index: 10;
+    -webkit-app-region: no-drag;
+    border: 3em solid rgba(16, 24, 29, 0.84);
+    background-clip: content-box;
+}
+
+.a b {
+    color: #eee;
+    opacity: .4;
+    transition: .2s;
+    position: absolute;
+    right: .2em;
+    top: .5em;
+    z-index: 1;
+    padding: 0 .5em;
+    cursor: default;
+}
+
+.a b:hover {
+    opacity: 1;
+}
+
 #cLis .cl {
     -webkit-app-region: no-drag;
     padding: 0 .4em;
@@ -90,7 +121,7 @@ textarea:focus+i+i+i,textarea:focus+i+i+i+i{
 
 .field b:after {content: 'X';}
 
-#new_deploy,#new_cmd,#flush,#new_sequence {
+#new_deploy,#new_cmd,#flush,#new_sequence,#json_cfg {
     float: right;
     background: rgba(0, 0, 0, 0.06);
     border: 1px solid rgba(83, 152, 162, 0.22);
@@ -107,7 +138,8 @@ textarea:focus+i+i+i,textarea:focus+i+i+i+i{
     transition: .2s;
 }
 
-#new_deploy:hover, #new_cmd:hover,#flush:hover,#new_sequence:hover{
+#new_deploy:hover, #new_cmd:hover,#json_cfg:hover,
+#flush:hover,#new_sequence:hover{
     opacity: 1;
     background: #24343c;
     border-color: transparent;
@@ -129,12 +161,12 @@ button {
 }
 
 button#save_c {
-    background: #4CAF50;
+    background: #2196F3;
     color: #fff;
 }
 
 button#del_c {
-    background: #F44336;
+    background: #795548;
     color: #fff;
 }
 
@@ -160,7 +192,7 @@ button#del_c {
 }
 
 button#add_c {
-    background: #2196F3;
+    background: #607D8B;
     color: #fff;
 }
 
@@ -194,7 +226,7 @@ button#add_c {
     bottom: 0;
     width: 11em;
     background: #24292b;
-    z-index: 2;
+    z-index: 4;
     transition: .5s ease-in-out;
 }
 
@@ -228,8 +260,20 @@ button#add_c {
     align-items: center;
 }
 
+.detail .a .f textarea {
+    height: 100%;
+    padding: 2em;
+    background: rgb(0, 0, 0);
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.27) 0 0 1em;
+}
+
 .f.path {
     margin-top: 2em;
+}
+
+.a .f.path {
+    margin: 0;
 }
 
 .detail .s>.f {
@@ -394,6 +438,7 @@ span#add_cfg:after {
     overflow-x: hidden;
     padding: 0 1em;
     -webkit-app-region: no-drag;
+    background: inherit;
 }
 
 #choose {
